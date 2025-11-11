@@ -1,8 +1,8 @@
-// frontend/src/pages/MyBlogs.jsx
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import API from '../api';
 import BlogCard from '../components/BlogCard';
+import { Sparkles, Plus, Image, Tag, X, Loader2, Wand2, Clock, PenTool } from 'lucide-react';
 
 export default function MyBlogs({ user }) {
   const [blogs, setBlogs] = useState([]);
@@ -15,7 +15,7 @@ export default function MyBlogs({ user }) {
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiGenerated, setAiGenerated] = useState(''); // generated content
+  const [aiGenerated, setAiGenerated] = useState('');
   const [aiError, setAiError] = useState('');
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function MyBlogs({ user }) {
   };
 
   const onDelete = async (id) => {
-    if (!confirm('Delete this blog?')) return;
+    if (!window.confirm('Are you sure you want to delete this blog?')) return;
     try {
       await API.delete(`/blogs/${id}`);
       fetchMyBlogs();
@@ -65,14 +65,14 @@ export default function MyBlogs({ user }) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setForm((prev) => ({ ...prev, image: reader.result }));
+    reader.onload = () => setForm(prev => ({ ...prev, image: reader.result }));
     reader.readAsDataURL(file);
   };
 
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.title || !form.content) return setError('Title and content required');
+    if (!form.title || !form.content) return setError('Title and content are required');
 
     try {
       if (editing) {
@@ -80,24 +80,24 @@ export default function MyBlogs({ user }) {
           title: form.title,
           content: form.content,
           image: form.image,
-          tags: form.tags,
+          tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         });
       } else {
         await API.post('/blogs', {
           title: form.title,
           content: form.content,
           image: form.image,
-          tags: form.tags,
+          tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         });
       }
       cancelEdit();
       fetchMyBlogs();
     } catch (err) {
-      setError(err?.response?.data?.message || 'Error');
+      setError(err?.response?.data?.message || 'Failed to save blog');
     }
   };
 
-  // --- AI functions ---
+  // --- AI Functions ---
   const openAiModal = () => {
     setAiTopic('');
     setAiGenerated('');
@@ -121,11 +121,9 @@ export default function MyBlogs({ user }) {
         setAiError('No content returned from AI.');
       } else {
         setAiGenerated(generated);
-        // Fill form.title + content so user can click Save to publish
-        setForm((prev) => ({ ...prev, title: aiTopic, content: generated }));
+        setForm(prev => ({ ...prev, title: aiTopic, content: generated }));
       }
     } catch (err) {
-      console.error('AI generation error', err);
       setAiError(err?.response?.data?.message || 'AI generation failed');
     } finally {
       setAiLoading(false);
@@ -133,7 +131,6 @@ export default function MyBlogs({ user }) {
   };
 
   const saveAiAsBlog = async () => {
-    // uses same create API
     if (!form.title || !form.content) {
       setAiError('Title and content required to save.');
       return;
@@ -143,142 +140,354 @@ export default function MyBlogs({ user }) {
         title: form.title,
         content: form.content,
         image: form.image,
-        tags: form.tags
+        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
       });
-      // Reset and close AI modal
       setShowAiModal(false);
       setForm({ title: '', content: '', image: '', tags: '' });
+      setAiGenerated('');
       fetchMyBlogs();
     } catch (err) {
-      console.error('Save AI blog error', err);
       setAiError(err?.response?.data?.message || 'Failed to save blog');
     }
   };
 
   return (
-    <div className="space-y-6 relative">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">My Blogs</h2>
+    <div className="min-h-screen from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 space-y-8">
 
-        <div className="flex items-center gap-3">
-          {/* Create Blog */}
-          <button
-            onClick={() => {
-              setShowModal(true);
-              setEditing(null);
-              setForm({ title: '', content: '', image: '', tags: '' });
-            }}
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-          >
-            + Create Blog
-          </button>
+      <div className="max-w-7xl mx-auto space-y-8">
 
-          {/* AI Blog FAB / Button */}
-          <button
-            onClick={openAiModal}
-            title="Generate blog with AI"
-            className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition flex items-center gap-2"
-          >
-            {/* simple icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M2 5.5A2.5 2.5 0 014.5 3h11A2.5 2.5 0 0118 5.5V9a1 1 0 01-1 1h-1v5a2 2 0 01-2 2H6a2 2 0 01-2-2V10H3a1 1 0 01-1-1V5.5z" />
-            </svg>
-            AI Blog
-          </button>
-        </div>
-      </div>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-3xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              My Blogs
+            </h2>
+            <p className="text-slate-600 mt-1">Manage your stories and generate new ones with AI</p>
+          </div>
 
-      {/* Blog List */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Your posts</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {blogs.map((b) => (
-            <BlogCard
-              key={b._id}
-              blog={b}
-              onEdit={startEdit}
-              onDelete={() => onDelete(b._id)}
-              onLike={() => {}}
-              currentUser={{ id: user.id || user._id }}
-            />
-          ))}
-        </div>
-      </div>
+          <div className="flex items-center gap-3">
+            {/* Create Blog */}
+            <button
+              onClick={() => {
+                setShowModal(true);
+                setEditing(null);
+                setForm({ title: '', content: '', image: '', tags: '' });
+              }}
+              className="inline-flex items-center gap-2 px-5 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              <Plus size={20} />
+              Create Blog
+            </button>
 
-      {/* Create/Edit Modal (existing) */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg relative">
-            <button onClick={cancelEdit} className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl">✕</button>
-
-            <h2 className="text-xl font-semibold mb-3">{editing ? 'Edit Blog' : 'Create New Blog'}</h2>
-
-            <form onSubmit={submit} className="space-y-3">
-              <input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} placeholder="Title" className="w-full p-2 border rounded" />
-              <textarea value={form.content} onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))} placeholder="Write your content..." className="w-full p-2 border rounded h-32" />
-              <div className="flex gap-3 items-center">
-                <input type="file" accept="image/*" onChange={handleImage} />
-                {form.image && <img src={form.image} alt="preview" className="h-20 w-20 object-cover rounded" />}
-              </div>
-              <input value={form.tags} onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))} placeholder="Tags (comma separated)" className="w-full p-2 border rounded" />
-              {error && <div className="text-sm text-red-600">{error}</div>}
-              <div className="flex justify-end gap-3 mt-3">
-                <button type="button" onClick={cancelEdit} className="px-4 py-2 border rounded">Cancel</button>
-                <button className="px-4 py-2 bg-indigo-600 text-white rounded">{editing ? 'Update' : 'Publish'}</button>
-              </div>
-            </form>
+            {/* AI Blog */}
+            <button
+              onClick={openAiModal}
+              className="inline-flex items-center gap-2 px-5 py-3 bg-linear-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              <Wand2 size={20} />
+              AI Blog
+            </button>
           </div>
         </div>
-      )}
 
-      {/* AI Modal */}
-      {showAiModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-2xl relative">
-            <button onClick={() => setShowAiModal(false)} className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl">✕</button>
+        {/* Surat Time */}
+        <p className="text-sm text-slate-500 flex items-center gap-1">
+          <Clock size={14} />
+          {new Date().toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          }).toLowerCase()} in Surat, Gujarat
+        </p>
 
-            <h2 className="text-xl font-semibold mb-3">Generate Blog with AI</h2>
-
-            {/* Topic input */}
-            <div className="space-y-2">
-              <label className="text-sm">Enter a blog title or topic</label>
-              <input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} placeholder="e.g., '5 Tips for Productive Remote Work'" className="w-full p-2 border rounded" />
+        {/* Blog Grid */}
+        <div>
+          {blogs.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                <PenTool size={48} className="text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">No blogs yet</h3>
+              <p className="text-slate-500 max-w-md mx-auto">
+                Start writing your first blog or generate one with AI!
+              </p>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {blogs.map((b, i) => (
+                <div
+                  key={b._id}
+                  className="animate-fadeIn"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <BlogCard
+                    blog={b}
+                    onEdit={startEdit}
+                    onDelete={() => onDelete(b._id)}
+                    onLike={() => { }}
+                    currentUser={{ id: user.id || user._id }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-            <div className="mt-3 flex items-center gap-3">
-              <button onClick={generateWithAI} disabled={aiLoading} className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition flex items-center gap-2">
-                {aiLoading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /></svg>
-                    Generating...
-                  </>
-                ) : 'Generate'}
+        {/* Create/Edit Modal */}
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative">
+              <button
+                onClick={cancelEdit}
+                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X size={20} />
               </button>
 
-              <button onClick={() => { setShowAiModal(false); }} className="px-4 py-2 border rounded">Close</button>
-            </div>
-
-            {/* AI error */}
-            {aiError && <div className="text-sm text-red-600 mt-2">{aiError}</div>}
-
-            {/* Generated preview / editor */}
-            {aiGenerated ? (
-              <div className="mt-4 space-y-3">
-                <label className="text-sm">Preview (edit if you want)</label>
-                <input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} placeholder="Title" className="w-full p-2 border rounded" />
-                <textarea value={form.content} onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))} className="w-full p-2 border rounded h-64" />
-                <div className="flex justify-end gap-3">
-                  <button onClick={() => { setForm({ title: '', content: '', image: '', tags: '' }); setAiGenerated(''); }} className="px-4 py-2 border rounded">Discard</button>
-                  <button onClick={saveAiAsBlog} className="px-4 py-2 bg-indigo-600 text-white rounded">Save as Blog</button>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-linear-to-br from-indigo-500 to-purple-500 rounded-xl text-white">
+                  {editing ? <PenTool size={28} /> : <Plus size={28} />}
                 </div>
+                <h2 className="text-2xl font-bold text-slate-800">
+                  {editing ? 'Edit Blog' : 'Create New Blog'}
+                </h2>
               </div>
-            ) : (
-              <div className="mt-4 text-sm text-slate-600">After generation completes the blog content will appear here for preview and editing.</div>
-            )}
+
+              <form onSubmit={submit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
+                  <input
+                    value={form.title}
+                    onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Enter a catchy title..."
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Content</label>
+                  <textarea
+                    value={form.content}
+                    onChange={e => setForm(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="Write your story..."
+                    rows={8}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none transition-all"
+                  />
+
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Image</label>
+                    <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-indigo-400 transition-colors">
+                      <Image size={20} />
+                      <span>{form.image ? 'Change Image' : 'Upload Image'}</span>
+                      <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
+                    </label>
+                    {form.image && (
+                      <img src={form.image} alt="preview" className="mt-3 h-32 w-full object-cover rounded-xl shadow-md" />
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Tags</label>
+                    <div className="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-xl">
+                      <Tag size={20} className="text-slate-400" />
+                      <input
+                        value={form.tags}
+                        onChange={e => setForm(prev => ({ ...prev, tags: e.target.value }))}
+                        placeholder="tech, life, travel..."
+                        className="flex-1 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-center gap-2">
+                    <AlertCircle size={18} />
+                    {error}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    className="px-6 py-3 border border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  >
+                    {editing ? 'Update Blog' : 'Publish Blog'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* AI Modal */}
+        {showAiModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 relative">
+              <button
+                onClick={() => setShowAiModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-linear-to-br from-emerald-500 to-teal-500 rounded-xl text-white">
+                  <Sparkles size={28} />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Generate Blog with AI</h2>
+              </div>
+
+              {/* Topic Input */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Blog Title or Topic</label>
+                <input
+                  value={aiTopic}
+                  onChange={e => setAiTopic(e.target.value)}
+                  placeholder="e.g., '5 Tips for Productive Remote Work'"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  onClick={generateWithAI}
+                  disabled={aiLoading}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {aiLoading ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 size={20} />
+                      Generate Content
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowAiModal(false)}
+                  className="px-6 py-3 border border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+
+              {aiError && (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm mb-4 flex items-center gap-2">
+                  <AlertCircle size={18} />
+                  {aiError}
+                </div>
+              )}
+
+              {/* Generated Content */}
+              {aiGenerated && (
+                <div className="space-y-5 mt-6 p-6 bg-linear-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <Sparkles size={20} className="text-emerald-600" />
+                    AI-Generated Blog
+                  </h3>
+
+                  <input
+                    value={form.title}
+                    onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Edit title..."
+                    className="w-full px-4 py-3 border border-emerald-300 rounded-xl bg-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+
+                  <textarea
+                    value={form.content}
+                    onChange={e => setForm(prev => ({ ...prev, content: e.target.value }))}
+                    rows={12}
+                    className="w-full px-4 py-3 border border-emerald-300 rounded-xl bg-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  />
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Tags</label>
+                    <div className="flex items-center gap-2 px-4 py-3 border border-emerald-300 rounded-xl bg-white/70">
+                      <Tag size={20} className="text-emerald-400" />
+                      <input
+                        value={form.tags}
+                        onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
+                        placeholder="ai, technology, writing..."
+                        className="flex-1 outline-none bg-transparent"
+                      />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Separate multiple tags with commas</p>
+                  </div>
+
+                  {/* Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Upload Image</label>
+                    <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-emerald-300 rounded-xl cursor-pointer hover:border-emerald-400 transition-colors">
+                      <Image size={20} className="text-emerald-500" />
+                      <span>{form.image ? 'Change Image' : 'Upload Image'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = () =>
+                            setForm((prev) => ({ ...prev, image: reader.result }));
+                          reader.readAsDataURL(file);
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    {form.image && (
+                      <img
+                        src={form.image}
+                        alt="Preview"
+                        className="mt-3 h-40 w-full object-cover rounded-xl shadow-md border border-emerald-200"
+                      />
+                    )}
+                  </div>
+
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setForm({ title: '', content: '', image: '', tags: '' });
+                        setAiGenerated('');
+                      }}
+                      className="px-5 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      Discard
+                    </button>
+                    <button
+                      onClick={saveAiAsBlog}
+                      className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all"
+                    >
+                      Save as Blog
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!aiGenerated && !aiLoading && (
+                <p className="text-center text-slate-500 italic">
+                  Enter a topic above and click "Generate" to create a blog with AI
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
