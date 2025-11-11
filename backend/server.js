@@ -1,9 +1,10 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./utils/db');
+require('dotenv').config();
 
+const aiRoutes = require('./routes/ai'); 
 const authRoutes = require('./routes/auth');
 const blogRoutes = require('./routes/blogs');
 const likeRoutes = require('./routes/likes');
@@ -25,6 +26,7 @@ app.get('/', (req, res) => res.send('MERN Blog API'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/likes', likeRoutes); // like endpoint
 
 app.use((err, req, res, next) => {

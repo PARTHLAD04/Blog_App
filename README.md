@@ -1,38 +1,41 @@
 # Blog Application
 
-A full-stack blog application built with the MERN stack (MongoDB, Express.js, React, Node.js) that allows users to create, read, update, and delete blog posts.
+A modern full-stack blog application built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring AI-powered content generation and a clean, responsive interface.
 
-## Features
+## ✨ Features
 
-- User authentication (Register/Login)
-- Create, read, update, and delete blog posts
-- Responsive design for all devices
-- Rich text editing for blog content
-- Secure user authentication using JWT
-- RESTful API architecture
+- 🔐 User authentication (Register/Login)
+- 📝 Create, read, update, and delete blog posts
+- 🎨 Clean, responsive design with Tailwind CSS
+- 🤖 AI-powered blog post generation
+- ❤️ Like and interact with posts
+- 🔒 Secure authentication using JWT
+- ⚡ Fast and efficient API with Express.js
+- 🚀 Vite for optimized frontend builds
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- React.js
-- Redux (for state management)
-- React Router (for navigation)
-- Axios (for API requests)
-- Material-UI or Tailwind CSS (for styling)
+- ⚛️ React 19
+- 🛣️ React Router v6
+- 🎨 Tailwind CSS for styling
+- 🔄 React Icons
+- 📊 React Toastify for notifications
+- ⚡ Vite for development and building
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB (with Mongoose ODM)
-- JSON Web Tokens (JWT) for authentication
-- Bcrypt for password hashing
-- Dotenv for environment variables
+- 🚀 Node.js with Express.js
+- 🍃 MongoDB with Mongoose
+- 🔑 JWT for authentication
+- 🔒 Bcrypt for password hashing
+- 🌐 CORS enabled
+- 📦 Body parser for request handling
 
-## Prerequisites
+## 🚀 Prerequisites
 
-- Node.js (v14 or later)
-- npm or yarn
-- MongoDB Atlas account or local MongoDB installation
+- Node.js (v18 or later)
+- npm (v9 or later) or yarn
+- MongoDB Atlas account or local MongoDB installation (v6.0 or later)
 
 ## Getting Started
 
@@ -82,16 +85,14 @@ A full-stack blog application built with the MERN stack (MongoDB, Express.js, Re
    npm start
    ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-blog-app/
+Blog app/
 ├── backend/               # Backend server
-│   ├── config/           # Configuration files
-│   ├── controllers/      # Route controllers
-│   ├── middleware/       # Custom middleware
-│   ├── models/           # MongoDB models
-│   ├── routes/           # API routes
+│   ├── middleware/       # Authentication middleware
+│   ├── models/           # MongoDB models (User, Blog)
+│   ├── routes/           # API routes (auth, blogs, likes, ai)
 │   ├── utils/            # Utility functions
 │   ├── .env              # Environment variables
 │   ├── package.json      # Backend dependencies
@@ -100,11 +101,12 @@ blog-app/
 └── frontend/             # Frontend React application
     ├── public/           # Static files
     └── src/              # Source code
+        ├── assets/       # Static assets
         ├── components/   # Reusable components
         ├── pages/        # Page components
-        ├── redux/        # Redux store and slices
-        ├── utils/        # Utility functions
-        └── App.js        # Main component
+        ├── App.jsx       # Main component
+        ├── main.jsx      # Entry point
+        └── api.js        # API service
 ```
 
 ## Available Scripts
@@ -119,18 +121,24 @@ blog-app/
 - `npm test` - Run tests
 - `npm run build` - Build for production
 
-## API Endpoints
+## 🔌 API Endpoints
 
 ### Auth
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login user
 
-### Posts
-- `GET /api/posts` - Get all posts
-- `GET /api/posts/:id` - Get a single post
-- `POST /api/posts` - Create a new post (protected)
-- `PUT /api/posts/:id` - Update a post (protected)
-- `DELETE /api/posts/:id` - Delete a post (protected)
+### Blogs
+- `GET /blogs` - Get all blog posts
+- `GET /blogs/:id` - Get a single blog post
+- `POST /blogs` - Create a new blog post (protected)
+- `PUT /blogs/:id` - Update a blog post (protected)
+- `DELETE /blogs/:id` - Delete a blog post (protected)
+
+### AI
+- `POST /ai/generate` - Generate blog content using AI (protected)
+
+### Likes
+- `POST /likes/:blogId` - Toggle like on a blog post (protected)
 
 ## Contributing
 
@@ -140,12 +148,12 @@ blog-app/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
+## ✉️ Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter) - your.email@example.com
+Parth Lad - [@ParthLad04](https://github.com/ParthLad04)
 
-Project Link: [https://github.com/yourusername/blog-app](https://github.com/yourusername/blog-app)
+Project Link: [https://github.com/ParthLad04/Blog_App](https://github.com/ParthLad04/Blog_App)
