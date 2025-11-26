@@ -78,7 +78,7 @@ export default function Signup({ onAuth }) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-indigo-500 to-purple-500 rounded-2xl mb-4 shadow-lg">
               <Sparkles size={32} className="text-white" />
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Create Account
             </h2>
             <p className="text-slate-600 mt-2">Join the MERN Blog community</p>
@@ -178,7 +178,7 @@ export default function Signup({ onAuth }) {
             {/* Error Message */}
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-shake flex items-center gap-2">
-                <AlertCircle size={18} className="flex-shrink-0" />
+                <AlertCircle size={18} className="shrink-0" />
                 {error}
               </div>
             )}
@@ -187,7 +187,7 @@ export default function Signup({ onAuth }) {
             <button
               type="submit"
               disabled={loading || !form.name || !form.email || form.password.length < 6}
-              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] focus:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+              className="w-full py-4 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] focus:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
             >
               {loading ? (
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
